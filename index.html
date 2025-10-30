@@ -1,209 +1,173 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<title>Zamir's Portfolio</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Colorblindness Predictor (Simple)</title>
+  <meta name="description" content="Simple demo that predicts child colorblindness probability from parents' statuses." />
+  <style>
+    :root{
+      --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --accent:#60a5fa; --success:#34d399; --danger:#fb7185;
+      --glass: rgba(255,255,255,0.03);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(180deg,#071129 0%, #071827 100%); color:#e6eef8; -webkit-font-smoothing:antialiased;
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;
+    }
+    .card{
+      width:100%; max-width:720px; background:var(--card); border-radius:14px; padding:28px; box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    h1{font-size:20px;margin:0 0 8px}
+    p.lead{margin:0 0 20px;color:var(--muted)}
+    .row{display:flex; gap:18px; align-items:center; flex-wrap:wrap}
+    .col{flex:1 1 200px; min-width:200px}
+    .switch{
+      display:flex; align-items:center; gap:12px; background:var(--glass); padding:12px;border-radius:10px;
+      border:1px solid rgba(255,255,255,0.02)
+    }
+    .switch label{display:flex; gap:12px; align-items:center; cursor:pointer; user-select:none}
+    /* Toggle styling */
+    .toggle{
+      --w:54px; --h:30px; width:var(--w); height:var(--h); border-radius:999px; position:relative;
+      background:rgba(255,255,255,0.08); transition:background .18s ease, box-shadow .18s;
+      display:inline-block; vertical-align:middle;
+    }
+    .toggle .knob{
+      position:absolute; top:3px; left:3px; width:calc(var(--h) - 6px); height:calc(var(--h) - 6px);
+      border-radius:50%; background:#fff; transform:translateX(0); transition:transform .18s cubic-bezier(.2,.9,.2,1);
+      box-shadow: 0 4px 10px rgba(2,6,23,0.6);
+    }
+    input[type="checkbox"]{display:none}
+    input[type="checkbox"]:checked + .toggle{
+      background:linear-gradient(90deg,var(--accent), #2563eb);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.2);
+    }
+    input[type="checkbox"]:checked + .toggle .knob{ transform:translateX(calc(var(--w) - var(--h))); }
+    .label-text{font-weight:600}
+    .muted{color:var(--muted); font-size:13px}
+    .result{
+      margin-top:20px; padding:18px; border-radius:10px; display:flex; gap:14px; align-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .badge{
+      min-width:72px; text-align:center; padding:10px 12px; border-radius:10px; font-weight:700;
+      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03);
+    }
+    .prog{
+      height:10px; background:rgba(255,255,255,0.05); border-radius:999px; overflow:hidden; width:100%;
+    }
+    .prog > i{display:block; height:100%; width:0%; transition:width .4s ease, background-color .2s}
+    footer{margin-top:18px; color:var(--muted); font-size:13px}
+    @media (max-width:560px){ .row{flex-direction:column} .col{min-width:0} }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Colorblindness Predictor</h1>
+    <p class="lead">Toggle parents' colorblindness and see the simple predicted chance for a child.</p>
 
-		<!-- Wrapper -->
-			<div id="wrapper" class="fade-in">
+    <div class="row" role="group" aria-label="Parents colorblindness toggles">
+      <div class="col switch" id="fatherRow">
+        <label for="fatherToggle">
+          <input type="checkbox" id="fatherToggle" aria-checked="false" />
+          <span class="toggle" aria-hidden="true"><span class="knob"></span></span>
+          <div>
+            <div class="label-text">Father</div>
+            <div class="muted">Colorblindness: <span id="fatherState">No</span></div>
+          </div>
+        </label>
+      </div>
 
-				<!-- Intro -->
-					<div id="intro">
-						<a class="image"><img src="images/zamir.jpg" width="500" height="650" ></a><br />
-						<h1>Zamir's Portfolio</h1>
-						<p>Software Developer skilled in Object-Oriented Programming, AI, and Machine Learning. </p>
-						<a href="https://linktr.ee/zamirhkhan" target="_blank"> Learn More </a><br />
-						<ul class="actions">
-							<li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
-						</ul>
-					</div>
+      <div class="col switch" id="motherRow">
+        <label for="motherToggle">
+          <input type="checkbox" id="motherToggle" aria-checked="false" />
+          <span class="toggle" aria-hidden="true"><span class="knob"></span></span>
+          <div>
+            <div class="label-text">Mother</div>
+            <div class="muted">Colorblindness: <span id="motherState">No</span></div>
+          </div>
+        </label>
+      </div>
+    </div>
 
-				<!-- Header -->
-					<header id="header">
-					</header>
+    <div class="result" aria-live="polite">
+      <div class="badge" id="percentBadge">0%</div>
+      <div style="flex:1">
+        <div style="display:flex; align-items:center; gap:12px; justify-content:space-between">
+          <div style="font-weight:700">Predicted chance the child is colorblind</div>
+          <div class="muted" id="explanation">Father: no — Mother: no</div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="prog" aria-hidden="true"><i id="barFill" style="width:0%"></i></div>
+        </div>
+      </div>
+    </div>
 
-				<!-- Nav -->
-					<nav id="nav">
-						<ul class="links">
-							<li class="active"><a>Projects</a></li>
-						
-							
-						</ul>
-						<ul class="icons">
-							<li><a href="https://www.linkedin.com/in/zamirhkhan/" target="_blank" class="icon brands alt fa-linkedin"><span class="label">Twitter</span></a></li>
-							<li><a href="https://github.com/Zamir-Khan" target="_blank" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
-							
-						</ul>
-					</nav>
+    <footer>
+      Note: This is a simple demo visualization of the probabilities you provided. Not medical advice.
+    </footer>
+  </main>
 
-				<!-- Main -->
-					<div id="main">
+  <script>
+    // Quick accessibility helpers
+    const fatherToggle = document.getElementById('fatherToggle');
+    const motherToggle = document.getElementById('motherToggle');
+    const fatherState = document.getElementById('fatherState');
+    const motherState = document.getElementById('motherState');
+    const percentBadge = document.getElementById('percentBadge');
+    const explanation = document.getElementById('explanation');
+    const barFill = document.getElementById('barFill');
 
-						<!-- Featured Post -->
-							<article class="post featured">
-								<header class="major">
-									
-									<!-- Pocket Poker -->
-									<h2><a href="https://github.com/Zamir-Khan/Pocket_Poker" target="_blank">Pocket Poker<br />
-									</a></h2>
-									<p>Android full-stack 5-card stud poker game with multiplayer integration using Wifi Direct and object-oriented Java.</p>
-								</header>
-								<a class="image main"><img src="images/poker.webp" alt="" /></a>
-								<ul class="actions special">
-									<li><a href="https://github.com/Zamir-Khan/Pocket_Poker" target="_blank" class="button large">View Project</a></li>
-								</ul>
-							</article>
+    // Rules provided
+    // F=yes M=no => 50%
+    // F=no  M=yes => 50%
+    // F=yes M=yes => 100%
+    // F=no  M=no  => 0%
+    function computeProbability(fatherYes, motherYes){
+      if(fatherYes && motherYes) return 99;
+      if(fatherYes && !motherYes) return 50;
+      if(!fatherYes && motherYes) return 50;
+      return 0;
+    }
 
-						<!-- Posts -->
-							<section class="posts">
-								<article>
-									<header>
-										<!-- Malware Detection Model -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/Malware-Detection-Model" target="_blank">Malware Detection Model</a></h2>
-									</header>
-									<a class="image fit"><img src="images/malwaredet.webp" width=auto height="350" /></a>
-									<p>Machine Learning Model for malware detection using K-Nearest Neighbors (K-NN) and Random Forest Classifiers with Data Preprocessing in Python.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/Malware-Detection-Model" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
+    function updateUI(){
+      const f = fatherToggle.checked;
+      const m = motherToggle.checked;
+      const pct = computeProbability(f,m);
 
-								<article>
-									<header>
-										<!-- Stock Prediction -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/Stock-Price-Prediction-LSTM/tree/main" target="_blank">Stock Prediction Model</a></h2>
-									</header>
-									<a class="image fit"><img src="images/stock.png" width=auto height="350" /></a>
-									<p>Resilient Machine Learning Model for the prediction of Stock Closing Price through the Utilization of Long Short-Term Memory (LSTM) Networks using Python.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/Stock-Price-Prediction-LSTM/tree/main" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
+      // update textual states
+      fatherState.textContent = f ? 'Yes' : 'No';
+      motherState.textContent = m ? 'Yes' : 'No';
+      percentBadge.textContent = pct + '%';
+      explanation.textContent = `Father: ${f ? 'yes' : 'no'} — Mother: ${m ? 'yes' : 'no'}`;
 
-								<article>
-									<header>
-										<!-- Handwritten -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/Handwritten-Digits-Recognition-KNN" target="_blank">Digits Recognition Model</a></h2>
-									</header>
-									<a class="image fit"><img src="images/handwritten.png" width=auto height="350" /></a>
-									<p>This project implements a handwritten digit recognition model using the KNeighborsClassifier algorithm from scikit-learn in Python.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/Handwritten-Digits-Recognition-KNN" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
+      // progress bar color & width
+      barFill.style.width = pct + '%';
+      if(pct === 100){
+        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--success') || '#34d399';
+      } else if(pct === 50){
+        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#60a5fa';
+      } else {
+        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--danger') || '#fb7185';
+      }
 
+      // update aria attributes for custom toggle
+      fatherToggle.setAttribute('aria-checked', String(f));
+      motherToggle.setAttribute('aria-checked', String(m));
+    }
 
-								<article>
-									<header>
-										<!-- Personal Chatbot -->
-									<h2><a href="https://github.com/Zamir-Khan/Personal-Chatbot" target="_blank">Personal Chatbot<br />
-									</header>
-									</a></h2><a class="image fit"><img src="images/chatbot.jpeg" width=auto height="350"  /></a>
-									<p>Full-stack AI chatbot that leverages the power of GPT-3.5 and DALL.E using Python to provide dynamic and engaging interactions through natural language.</p>
-								
-								<ul class="actions special">
-									<li><a href="https://github.com/Zamir-Khan/Personal-Chatbot" target="_blank" class="button">View Project</a></li>
-								</ul>
-								</article>
-								
-								<article>
-									<header>
-										<!-- Flight Planner -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/Flight-Planner" target="_blank">Flight Planner</a></h2>
-									</header>
-									<a class="image fit"><img src="images/flight.avif" width=auto height="350" /></a>
-									<p>Dynamic flight planner that efficiently determines the most cost-effective and expeditious routes for flights using JAVA and Object-Oriented Programming.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/Flight-Planner" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
+    // wire events
+    fatherToggle.addEventListener('change', updateUI);
+    motherToggle.addEventListener('change', updateUI);
 
-								<article>
-									<header>
-										<!-- Barrier -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/Synchronization-Barrier" target="_blank">Synchronization Barrier</a></h2>
-									</header>
-									<a class="image fit"><img src="images/barrier.jpeg" width=auto height="350" /></a>
-									<p>Process synchronization barrier implemented using Semaphores in C++ on UNIX ensuring enhanced coordination among processes.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/Synchronization-Barrier" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
-
-								<article>
-									<header>
-										<!-- 64 Bit ALU -->
-										
-										<h2><a href="https://github.com/Zamir-Khan/64-Bit_ALU_Processor" target="_blank">64-bit ALU Processor</a></h2>
-									</header>
-									<a class="image fit"><img src="images/processor.webp" width=auto height="350" /></a>
-									<p>64-bit ALU processor that carries out arithmetic and logic operations on the operands in computer instruction words using Verilog.</p>
-									<ul class="actions special">
-										<li><a href="https://github.com/Zamir-Khan/64-Bit_ALU_Processor" target="_blank" class="button">View Project</a></li>
-									</ul>
-								</article>
-			
-								
-							</section>
-
-						
-
-					</div>
-
-				<!-- Footer -->
-					<footer id="footer">
-						<section class="split contact">
-							<section class="alt">
-								<h3>Address</h3>
-								<p>800 W Campbell Rd<br />
-								Richardson, TX 75080</p>
-							</section>
-							<section>
-								<h3>Phone</h3>
-								<p><a href="tel:682-320-3794">(682) 320-3794</a></p>
-							</section>
-							<section>
-								<h3>Email</h3>
-								<p><a href = "mailto: zamirkhan25@gmail.com">zamirkhan25@gmail.com</a></p>
-							</section>
-							<section>
-								<h3>Social</h3>
-								<ul class="icons alt">
-									<li><a href="https://www.linkedin.com/in/zamirhkhan/" target="_blank" class="icon brands alt fa-linkedin"><span class="label">Linkedin</span></a></li>
-									<li><a href="https://github.com/Zamir-Khan" target="_blank" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
-									<li><a href="https://twitter.com/ZamirHossainKh1" target="_blank" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
-
-									
-								</ul>
-							</section>
-						</section>
-					</footer>
-
-				<!-- Copyright -->
-					<div id="copyright">
-						<ul><li>&copy; Zamir Khan</li></ul>
-					</div>
-
-			</div>
-
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-	</body>
+    // keyboard support: allow toggling via space/enter when focus on label areas (native checkbox handles this already).
+    // initial
+    updateUI();
+  </script>
+</body>
 </html>
