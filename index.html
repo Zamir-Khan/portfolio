@@ -2,80 +2,243 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Colorblindness Predictor (Simple)</title>
-  <meta name="description" content="Simple demo that predicts child colorblindness probability from parents' statuses." />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Colorblindness Predictor</title>
+  <meta name="description" content="Simple AI-style demo predicting colorblindness probability in offspring." />
   <style>
-    :root{
-      --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --accent:#60a5fa; --success:#34d399; --danger:#fb7185;
+    :root {
+      --bg: #0f172a;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --success: #34d399;
+      --danger: #fb7185;
       --glass: rgba(255,255,255,0.03);
       color-scheme: dark;
+      font-size: clamp(14px, 2vw, 17px);
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-      background: linear-gradient(180deg,#071129 0%, #071827 100%); color:#e6eef8; -webkit-font-smoothing:antialiased;
-      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(180deg, #071129 0%, #071827 100%);
+      color: #e6eef8;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5vw;
     }
-    .card{
-      width:100%; max-width:720px; background:var(--card); border-radius:14px; padding:28px; box-shadow: 0 6px 30px rgba(2,6,23,0.6);
-      border:1px solid rgba(255,255,255,0.03);
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: clamp(20px, 4vw, 32px);
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: fadeIn 0.4s ease;
     }
-    h1{font-size:20px;margin:0 0 8px}
-    p.lead{margin:0 0 20px;color:var(--muted)}
-    .row{display:flex; gap:18px; align-items:center; flex-wrap:wrap}
-    .col{flex:1 1 200px; min-width:200px}
-    .switch{
-      display:flex; align-items:center; gap:12px; background:var(--glass); padding:12px;border-radius:10px;
-      border:1px solid rgba(255,255,255,0.02)
+
+    h1 { font-size: 1.4rem; margin-bottom: 0.5em; text-align: center; }
+    p.lead { color: var(--muted); margin-bottom: 1.2em; font-size: 0.95rem; text-align: center; }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
     }
-    .switch label{display:flex; gap:12px; align-items:center; cursor:pointer; user-select:none}
-    /* Toggle styling */
-    .toggle{
-      --w:54px; --h:30px; width:var(--w); height:var(--h); border-radius:999px; position:relative;
-      background:rgba(255,255,255,0.08); transition:background .18s ease, box-shadow .18s;
-      display:inline-block; vertical-align:middle;
+
+    .col {
+      flex: 1 1 250px;
+      min-width: 45%;
     }
-    .toggle .knob{
-      position:absolute; top:3px; left:3px; width:calc(var(--h) - 6px); height:calc(var(--h) - 6px);
-      border-radius:50%; background:#fff; transform:translateX(0); transition:transform .18s cubic-bezier(.2,.9,.2,1);
-      box-shadow: 0 4px 10px rgba(2,6,23,0.6);
+
+    .switch {
+      display: flex;
+      align-items: center;
+      background: var(--glass);
+      border-radius: 10px;
+      padding: 1em;
+      border: 1px solid rgba(255,255,255,0.05);
     }
-    input[type="checkbox"]{display:none}
-    input[type="checkbox"]:checked + .toggle{
-      background:linear-gradient(90deg,var(--accent), #2563eb);
-      box-shadow: 0 6px 18px rgba(37,99,235,0.2);
+
+    .switch label {
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      width: 100%;
+      cursor: pointer;
     }
-    input[type="checkbox"]:checked + .toggle .knob{ transform:translateX(calc(var(--w) - var(--h))); }
-    .label-text{font-weight:600}
-    .muted{color:var(--muted); font-size:13px}
-    .result{
-      margin-top:20px; padding:18px; border-radius:10px; display:flex; gap:14px; align-items:center;
+
+    .toggle {
+      --w: 52px; --h: 28px;
+      width: var(--w);
+      height: var(--h);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      position: relative;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .knob {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: calc(var(--h) - 6px);
+      height: calc(var(--h) - 6px);
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+
+    input[type="checkbox"] { display: none; }
+
+    input[type="checkbox"]:checked + .toggle {
+      background: linear-gradient(90deg, var(--accent), #2563eb);
+    }
+
+    input[type="checkbox"]:checked + .toggle .knob {
+      transform: translateX(calc(var(--w) - var(--h)));
+    }
+
+    .label-text { font-weight: 600; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+
+    .result {
+      margin-top: 1.5em;
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 1em;
+      display: none;
+      align-items: center;
+      gap: 1em;
+      flex-wrap: wrap;
     }
-    .badge{
-      min-width:72px; text-align:center; padding:10px 12px; border-radius:10px; font-weight:700;
-      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03);
+
+    .badge {
+      font-weight: 700;
+      background: rgba(255,255,255,0.05);
+      padding: 0.6em 1em;
+      border-radius: 10px;
+      text-align: center;
+      min-width: 70px;
+      flex-shrink: 0;
     }
-    .prog{
-      height:10px; background:rgba(255,255,255,0.05); border-radius:999px; overflow:hidden; width:100%;
+
+    .prog {
+      height: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.5em;
     }
-    .prog > i{display:block; height:100%; width:0%; transition:width .4s ease, background-color .2s}
-    footer{margin-top:18px; color:var(--muted); font-size:13px}
-    @media (max-width:560px){ .row{flex-direction:column} .col{min-width:0} }
+
+    .prog > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease, background-color 0.3s;
+    }
+
+    .loader {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5em;
+      text-align: center;
+      gap: 0.8em;
+      color: var(--muted);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dots div {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .dots div:nth-child(2) { animation-delay: 0.2s; }
+    .dots div:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.6; }
+      40% { transform: scale(1.3); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    footer {
+      margin-top: 1.5em;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* SECOND PAGE */
+    #secondPage {
+      display: none;
+      flex-direction: column;
+      gap: 1em;
+      animation: fadeIn 0.4s ease;
+    }
+
+    input[type="text"] {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #fff;
+      padding: 0.8em 1em;
+      font-size: 1rem;
+      outline: none;
+      width: 100%;
+    }
+
+    button {
+      background: linear-gradient(90deg, var(--accent), #2563eb);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 0.8em;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.3s ease;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    @media (max-width: 600px) {
+      .card { padding: 6vw; }
+      .result { flex-direction: column; align-items: stretch; text-align: center; }
+      .row { flex-direction: column; align-items: stretch; }
+      .col { min-width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <main class="card" role="main" aria-labelledby="title">
-    <h1 id="title">Colorblindness Predictor</h1>
-    <p class="lead">Toggle parents' colorblindness and see the simple predicted chance for a child.</p>
+  <main class="card" id="mainPage">
+    <h1>Colorblindness Predictor</h1>
+    <p class="lead">Toggle parents’ colorblindness and watch AI “analyze” the result.</p>
 
-    <div class="row" role="group" aria-label="Parents colorblindness toggles">
-      <div class="col switch" id="fatherRow">
+    <div class="row">
+      <div class="col switch">
         <label for="fatherToggle">
-          <input type="checkbox" id="fatherToggle" aria-checked="false" />
-          <span class="toggle" aria-hidden="true"><span class="knob"></span></span>
+          <input type="checkbox" id="fatherToggle" />
+          <span class="toggle"><span class="knob"></span></span>
           <div>
             <div class="label-text">Father</div>
             <div class="muted">Colorblindness: <span id="fatherState">No</span></div>
@@ -83,10 +246,10 @@
         </label>
       </div>
 
-      <div class="col switch" id="motherRow">
+      <div class="col switch">
         <label for="motherToggle">
-          <input type="checkbox" id="motherToggle" aria-checked="false" />
-          <span class="toggle" aria-hidden="true"><span class="knob"></span></span>
+          <input type="checkbox" id="motherToggle" />
+          <span class="toggle"><span class="knob"></span></span>
           <div>
             <div class="label-text">Mother</div>
             <div class="muted">Colorblindness: <span id="motherState">No</span></div>
@@ -95,79 +258,143 @@
       </div>
     </div>
 
-    <div class="result" aria-live="polite">
+    <div class="loader" id="loader">
+      <div class="dots"><div></div><div></div><div></div></div>
+      <div>Analyzing genetic data...</div>
+    </div>
+
+    <div class="result" id="resultBox">
       <div class="badge" id="percentBadge">0%</div>
-      <div style="flex:1">
-        <div style="display:flex; align-items:center; gap:12px; justify-content:space-between">
-          <div style="font-weight:700">Predicted chance the child is colorblind</div>
-          <div class="muted" id="explanation">Father: no — Mother: no</div>
-        </div>
-        <div style="margin-top:10px;">
-          <div class="prog" aria-hidden="true"><i id="barFill" style="width:0%"></i></div>
-        </div>
+      <div style="flex: 1;">
+        <div style="font-weight:700">Predicted chance the child is colorblind</div>
+        <div class="muted" id="explanation">Father: no — Mother: no</div>
+        <div class="prog"><i id="barFill"></i></div>
       </div>
     </div>
 
-    <footer>
-      Note: This is a simple demo visualization of the probabilities you provided. Not medical advice.
-    </footer>
+    <div style="text-align:center; margin-top:1em;">
+      <button id="nextBtn">Ask about the result →</button>
+    </div>
+
+    <footer>This is a simplified visualization — not medical advice.</footer>
+  </main>
+
+  <!-- SECOND PAGE -->
+  <main class="card" id="secondPage">
+    <h1>Result Analysis</h1>
+    <p class="lead">Ask the AI assistant about your colorblindness result.</p>
+    <input type="text" id="questionInput" placeholder="Ask about the result..." />
+    <button id="askBtn">Submit</button>
+
+    <div class="loader" id="loader2">
+      <div class="dots"><div></div><div></div><div></div></div>
+      <div>Interpreting your question...</div>
+    </div>
+
+    <div class="loader" id="analyzing2">
+      <div class="dots"><div></div><div></div><div></div></div>
+      <div>Analyzing response...</div>
+    </div>
+
+    <div class="result" id="successBox">
+      <div class="badge" style="background: var(--success)">95%</div>
+      <div style="flex: 1;">
+        <div style="font-weight:700">Success Rate of Procedure</div>
+        <div class="muted">Based on genetic factors and AI data</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:1em;">
+      <button id="backBtn">← Back to Predictor</button>
+    </div>
   </main>
 
   <script>
-    // Quick accessibility helpers
-    const fatherToggle = document.getElementById('fatherToggle');
-    const motherToggle = document.getElementById('motherToggle');
-    const fatherState = document.getElementById('fatherState');
-    const motherState = document.getElementById('motherState');
-    const percentBadge = document.getElementById('percentBadge');
-    const explanation = document.getElementById('explanation');
-    const barFill = document.getElementById('barFill');
+    const fT = document.getElementById('fatherToggle');
+    const mT = document.getElementById('motherToggle');
+    const fS = document.getElementById('fatherState');
+    const mS = document.getElementById('motherState');
+    const badge = document.getElementById('percentBadge');
+    const expl = document.getElementById('explanation');
+    const bar = document.getElementById('barFill');
+    const loader = document.getElementById('loader');
+    const resultBox = document.getElementById('resultBox');
+    const nextBtn = document.getElementById('nextBtn');
+    const mainPage = document.getElementById('mainPage');
+    const secondPage = document.getElementById('secondPage');
 
-    // Rules provided
-    // F=yes M=no => 50%
-    // F=no  M=yes => 50%
-    // F=yes M=yes => 100%
-    // F=no  M=no  => 0%
-    function computeProbability(fatherYes, motherYes){
-      if(fatherYes && motherYes) return 99;
-      if(fatherYes && !motherYes) return 50;
-      if(!fatherYes && motherYes) return 50;
+    function compute(f, m) {
+      if (f && m) return 99;
+      if (f && !m) return 50;
+      if (!f && m) return 50;
       return 0;
     }
 
-    function updateUI(){
-      const f = fatherToggle.checked;
-      const m = motherToggle.checked;
-      const pct = computeProbability(f,m);
-
-      // update textual states
-      fatherState.textContent = f ? 'Yes' : 'No';
-      motherState.textContent = m ? 'Yes' : 'No';
-      percentBadge.textContent = pct + '%';
-      explanation.textContent = `Father: ${f ? 'yes' : 'no'} — Mother: ${m ? 'yes' : 'no'}`;
-
-      // progress bar color & width
-      barFill.style.width = pct + '%';
-      if(pct === 100){
-        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--success') || '#34d399';
-      } else if(pct === 50){
-        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#60a5fa';
-      } else {
-        barFill.style.background = getComputedStyle(document.documentElement).getPropertyValue('--danger') || '#fb7185';
-      }
-
-      // update aria attributes for custom toggle
-      fatherToggle.setAttribute('aria-checked', String(f));
-      motherToggle.setAttribute('aria-checked', String(m));
+    function showAnalyzing() {
+      resultBox.style.display = 'none';
+      loader.style.display = 'flex';
     }
 
-    // wire events
-    fatherToggle.addEventListener('change', updateUI);
-    motherToggle.addEventListener('change', updateUI);
+    function showResult(pct, f, m) {
+      loader.style.display = 'none';
+      resultBox.style.display = 'flex';
+      badge.textContent = pct + '%';
+      expl.textContent = `Father: ${f ? 'yes' : 'no'} — Mother: ${m ? 'yes' : 'no'}`;
+      bar.style.width = pct + '%';
+      bar.style.background =
+        pct === 100 ? 'var(--success)' :
+        pct === 50 ? 'var(--accent)' :
+        'var(--danger)';
+    }
 
-    // keyboard support: allow toggling via space/enter when focus on label areas (native checkbox handles this already).
-    // initial
-    updateUI();
+    function update() {
+      const f = fT.checked;
+      const m = mT.checked;
+      fS.textContent = f ? 'Yes' : 'No';
+      mS.textContent = m ? 'Yes' : 'No';
+
+      showAnalyzing();
+      const pct = compute(f, m);
+      setTimeout(() => showResult(pct, f, m), 3000);
+    }
+
+    fT.addEventListener('change', update);
+    mT.addEventListener('change', update);
+    update();
+
+    // PAGE SWITCH
+    nextBtn.addEventListener('click', () => {
+      mainPage.style.display = 'none';
+      secondPage.style.display = 'flex';
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      secondPage.style.display = 'none';
+      mainPage.style.display = 'block';
+    });
+
+    // SECOND PAGE LOGIC
+    const askBtn = document.getElementById('askBtn');
+    const loader2 = document.getElementById('loader2');
+    const analyzing2 = document.getElementById('analyzing2');
+    const successBox = document.getElementById('successBox');
+    const input = document.getElementById('questionInput');
+
+    askBtn.addEventListener('click', () => {
+      if (!input.value.trim()) return;
+      loader2.style.display = 'flex';
+      analyzing2.style.display = 'none';
+      successBox.style.display = 'none';
+
+      setTimeout(() => {
+        loader2.style.display = 'none';
+        analyzing2.style.display = 'flex';
+        setTimeout(() => {
+          analyzing2.style.display = 'none';
+          successBox.style.display = 'flex';
+        }, 3000);
+      }, 2000);
+    });
   </script>
 </body>
 </html>
